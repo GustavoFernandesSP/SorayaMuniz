@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,7 @@ public class Usuarios {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 
 
     @Enumerated(EnumType.STRING)

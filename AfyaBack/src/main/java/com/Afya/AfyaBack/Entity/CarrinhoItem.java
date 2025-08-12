@@ -2,6 +2,7 @@ package com.Afya.AfyaBack.Entity;
 
 import jakarta.persistence.*;
 
+@Entity
 public class CarrinhoItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,33 +1,23 @@
 package com.Afya.AfyaBack.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
+@Table(name = "orders")
 public class Order {
-
-    public enum Status {
-        PENDENTE,
-        PAGO,
-        CANCELADO
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String descricao;
+
     @ManyToOne
-    @JoinColumn(name = "id")
-    private Usuarios UsuarioID;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
-
-    private Double total;
-
+    @JoinColumn(name = "usuario_id")
+    @JsonBackReference
+    private Usuarios usuario;
 
 }
