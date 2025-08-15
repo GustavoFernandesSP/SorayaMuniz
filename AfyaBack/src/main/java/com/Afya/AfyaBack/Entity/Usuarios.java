@@ -30,6 +30,7 @@ public class Usuarios {
     @JsonManagedReference
     private List<Order> orders = new ArrayList<>();
 
+    private Carrinho carrinho;
 
     @Enumerated(EnumType.STRING)
     private Role role; // ADMIN ou USER
