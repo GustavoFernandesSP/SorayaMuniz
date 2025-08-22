@@ -46,6 +46,11 @@ public class CarrinhoController {
         }
         String token = authorizationHeader.substring(7);
 
+        boolean StringVerificarBarrer = jwtUtil.isTokenValid(token);
+        if (StringVerificarBarrer){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+        }
+
         // 2 Extrair e-mail do token
         String email = jwtUtil.extractEmail(token);
 

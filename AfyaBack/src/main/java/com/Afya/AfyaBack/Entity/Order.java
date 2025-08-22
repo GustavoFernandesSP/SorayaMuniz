@@ -15,6 +15,10 @@ public class Order {
 
     private String descricao;
 
+    private List<OrderItem> ItemsOrdem;
+
+    private Double valorFrete;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     @JsonBackReference
