@@ -28,5 +28,5 @@ public class Endereco {
     @OneToOne
     @JoinColumn(name = "usuario_id")
     @JsonBackReference  // Para evitar o loop recursivo de serialização
-    private Usuarios usuario;
+    private Usuario usuario;
 }

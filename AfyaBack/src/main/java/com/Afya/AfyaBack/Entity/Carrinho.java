@@ -1,7 +1,10 @@
 package com.Afya.AfyaBack.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -9,6 +12,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Carrinho {
 
     @Id
@@ -16,11 +21,12 @@ public class Carrinho {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
-    private Usuarios usuarios;
+    @JoinColumn(name = "usuario_id")
+    @JsonBackReference
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL)
-    private List<CarrinhoItem> items;
+    private List<Item> items;
 
 
 }

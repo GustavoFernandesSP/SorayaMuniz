@@ -2,7 +2,7 @@ package com.Afya.AfyaBack.Controller;
 
 import com.Afya.AfyaBack.DTO.LoginRequestDTO;
 import com.Afya.AfyaBack.DTO.TokenResponse;
-import com.Afya.AfyaBack.Entity.Usuarios;
+import com.Afya.AfyaBack.Entity.Usuario;
 import com.Afya.AfyaBack.Enum.Role;
 import com.Afya.AfyaBack.Repository.UsuarioRepository;
 import com.Afya.AfyaBack.Security.JwtUtil;
@@ -29,7 +29,7 @@ public class UsuarioController {
     private JwtUtil jwtUtil;
     
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Usuarios usuario) {
+    public ResponseEntity<?> register(@RequestBody Usuario usuario) {
 
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             return ResponseEntity.badRequest().body("Já existe um usuário com esse email!");
@@ -44,7 +44,7 @@ public class UsuarioController {
     }
 
     @GetMapping()
-    public List<Usuarios> listarUsuariosComEnderecos() {
+    public List<Usuario> listarUsuariosComEnderecos() {
         return usuarioRepository.findAll();
     }
 
@@ -55,12 +55,12 @@ public class UsuarioController {
         String email = loginRequest.getEmail();
         String senha = loginRequest.getSenha();
 
-        Optional<Usuarios> optionalUsuario = usuarioRepository.findByEmail(email);
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
         if (optionalUsuario.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email não existe.");
         }
 
-        Usuarios usuario = optionalUsuario.get();
+        Usuario usuario = optionalUsuario.get();
         if (!passwordEncoder.matches(senha, usuario.getSenha())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha inválida.");
         }

@@ -2,11 +2,10 @@ package com.Afya.AfyaBack.Controller;
 
 import com.Afya.AfyaBack.DTO.CarrinhoItemRequestDTO;
 import com.Afya.AfyaBack.Entity.Carrinho;
-import com.Afya.AfyaBack.Entity.CarrinhoItem;
-import com.Afya.AfyaBack.Entity.Produto;
-import com.Afya.AfyaBack.Entity.Usuarios;
+import com.Afya.AfyaBack.Entity.Item;
+import com.Afya.AfyaBack.Entity.Usuario;
 import com.Afya.AfyaBack.Repository.CarrinhoRepository;
-import com.Afya.AfyaBack.Repository.ProdutoRepository;
+import com.Afya.AfyaBack.Repository.ItemRepository;
 import com.Afya.AfyaBack.Repository.UsuarioRepository;
 import com.Afya.AfyaBack.Security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,15 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/carrinho")
 public class CarrinhoController {
 
-    private CarrinhoItem carrinhoItem;
+    private Item Item;
 
-    private ProdutoRepository produtoRepository;
+    private ItemRepository itemRepository;
 
     private UsuarioRepository usuarioRepository;
 
@@ -55,29 +52,23 @@ public class CarrinhoController {
         String email = jwtUtil.extractEmail(token);
 
         // 3 Busca o usuário mediante o email dele.
-        Usuarios usuario = usuarioRepository.findByEmail(email)
+        Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         // 4 Buscar ou criar carrinho
         Carrinho carrinho = carrinhoRepository.findByUsuario(usuario)
                 .orElseGet(() -> {
                     Carrinho novoCarrinho = new Carrinho();
-                    novoCarrinho.setUsuarios(usuario);
+                    novoCarrinho.setUsuario(usuario);
                     return carrinhoRepository.save(novoCarrinho);
                 });
 
-        // 5 Busca o produto para ver se ele existe.
-        Produto produto = produtoRepository.findById(produtoId)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+// 6 - Buscar item
+        Item Item = itemRepository.findById(produtoId)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
 
-
-        CarrinhoItem item = new CarrinhoItem(); // 6 Cria um novo carrinhoItem
-        item.setProduto(produto);               // Seta o Produto no carrinhoItem
-        item.setQuantidade(quantidade);         // Seta a quantidade informada
-        item.setCarrinho(carrinho);             // Seta o ID do carrinho que ele faz parte
-
-        carrinho.getItems().add(item);          // Pega o objeto carrinho que foi buscado ou criado na linha 51 e addiciona o objeto carrinhoItem no carrinho.
-        carrinhoRepository.save(carrinho);      // Salva o carrinho Editado.
+        carrinho.getItems().add(Item);
+        carrinhoRepository.save(carrinho);
 
         return ResponseEntity.ok(carrinho);
 
