@@ -9,6 +9,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,18 +17,40 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)  // habilita @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    // ✅ Filtro JWT como Bean
+    // ✅ CORS
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
+    }
+
+    // ✅ JWT Filter
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         return new JwtAuthenticationFilter(jwtUtil, userDetailsService);
     }
 
-    // ✅ Configuração do FilterChain
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/uploads/**");
+    }
+
+    // ✅ FilterChain principal
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtUtil jwtUtil,
@@ -39,24 +62,21 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/public/**",
-                                "/public/user/register",
                                 "/login",
-                                "/editor.html",       // ✅ Libera acesso ao editor
-                                "/api/pages/**",      // ✅ Libera as APIs do editor
-                                "/static/**",         // Se estiver usando pasta static
-                                "/css/**", "/js/**",   // CSS/JS do editor, se tiver
-                                "/api/pages/**",
-                                "/favicon.ico"  //Teste -------
+                                "/editor.html",
+                                "/item/**",
+                                "/public/user/**",
+                                "/uploads/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(jwtUtil, userDetailsService),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Gerenciador de autenticação
+    // ✅ AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
                                                        PasswordEncoder passwordEncoder) {
@@ -66,7 +86,7 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
-    // ✅ Serviço que busca usuários pelo e-mail
+    // ✅ UserDetailsService
     @Bean
     public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
         return email -> {
@@ -76,7 +96,7 @@ public class SecurityConfig {
         };
     }
 
-    // ✅ Codificador de senhas
+    // ✅ PasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();

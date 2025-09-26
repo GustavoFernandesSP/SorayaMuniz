@@ -1,10 +1,10 @@
 package com.Afya.AfyaBack.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import java.util.List;
 
 @Entity
 @Getter
@@ -14,7 +14,7 @@ public class Item {
     public enum Categoria {
         MASCULINO,
         FEMININO,
-        UNISSEX
+        UNISSEX;
     }
 
     @Id
@@ -36,7 +36,8 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private Item.Categoria categoria;
 
-    // Novo campo para armazenar URL ou caminho da imagem
-    private String imagemUrl;
+    @ElementCollection
+    @NotNull
+    private List<String> imagens;
 
 }
